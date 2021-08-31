@@ -5,3 +5,4 @@ healthdata
 videodata
 *.zip
 *.txt
+.dot
