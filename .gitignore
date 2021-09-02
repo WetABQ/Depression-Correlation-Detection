@@ -6,3 +6,4 @@ videodata
 *.zip
 *.txt
 .dot
+__pycache__
