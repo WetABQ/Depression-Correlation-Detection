@@ -20,8 +20,8 @@ class DepressionHealthData:
   def __play_healthdata(self):
     print("Read Health Data")
     #qu = reduce(lambda left, right: pd.merge(left, right, how='inner', on=['SEQN']), health_datas.values()) # Merge All
-    #self.df = self.raw_health_data["qu"]
-    self.df = self.raw_health_data["qu"].merge(self.raw_health_data["de"], how='inner', on=['SEQN']).merge(self.raw_health_data["me"], how='inner', on=['SEQN']) # Only Merge Questionnaire and Demographics
+    self.df = self.raw_health_data["qu"]
+    #self.df = self.raw_health_data["qu"].merge(self.raw_health_data["de"], how='inner', on=['SEQN']).merge(self.raw_health_data["me"], how='inner', on=['SEQN']) # Only Merge Questionnaire and Demographics
     print(self.df.head())
     print("Merged Data")
 
@@ -51,11 +51,11 @@ class DepressionHealthData:
   def prepare_data(self):
     self.__play_healthdata()
     self.__evaluate_depression_status()
-    #self.__clean_data()
+    #self.clean_data()
     
   
   @printTime
-  def __clean_data(self):
+  def clean_data(self):
     self.df = self.df.drop(['SEQN','DPQ010', 'DPQ020',	'DPQ030',	'DPQ040',	'DPQ050',	'DPQ060',	'DPQ070',	'DPQ080',	'DPQ090', "DPQ100"], axis=1)
     self.df = self.df.select_dtypes(exclude=['object'])
     self.df = self.df.fillna(0)

@@ -7,3 +7,5 @@ videodata
 *.txt
 .dot
 __pycache__
+plaidml-venv
+weibodata

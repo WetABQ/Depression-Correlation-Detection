@@ -20,6 +20,8 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.svm import SVC
 
+from sklearn.decomposition import PCA
+
 from sklearn.pipeline import Pipeline
 from sklearn.utils.extmath import density
 
@@ -35,13 +37,19 @@ class Model:
     self.df = df
 
   @printTime
-  def init_data_set(self, test_size = 0.3) -> None:
+  def init_data_set(self, enable_pca=True) -> None:
     # split the data into features and target
     self.X = self.df.iloc[:, 1:]
     self.y = self.df.iloc[:, 0]
 
+    if enable_pca:
+      pca = PCA(0.95)
+      pca.fit(self.X)
+      self.X = pca.transform(self.X)
+      self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.7)
+    else:
     # split the data into test and train
-    self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size)
+      self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.7)
 
   @printTime
   def train_logistic(self, train=False) -> LogisticRegression:
@@ -56,8 +64,8 @@ class Model:
     return svm
 
   @printTime
-  def train_mlp(self, train=False) -> MLPRegressor:
-    mlp = MLPRegressor(verbose=1, max_iter=100000, early_stopping=True)
+  def train_mlp(self, train=False) -> MLPClassifier:
+    mlp = MLPClassifier(verbose=1, max_iter=100000, early_stopping=True)
     if train: 
       self.train_model(mlp)
       plt.plot(mlp.loss_curve_)
@@ -66,14 +74,14 @@ class Model:
     return mlp
   
   @printTime
-  def train_decision_tree(self, train=False) -> DecisionTreeRegressor:
-    dtc = DecisionTreeRegressor()
+  def train_decision_tree(self, train=False) -> DecisionTreeClassifier:
+    dtc = DecisionTreeClassifier()
     if train: self.train_model(dtc)
     return dtc
 
   @printTime
-  def train_random_forest(self, train=False) -> RandomForestRegressor:
-    rfc = RandomForestRegressor()
+  def train_random_forest(self, train=False) -> RandomForestClassifier:
+    rfc = RandomForestClassifier()
     if train: self.train_model(rfc)
     return rfc
 
@@ -92,7 +100,8 @@ class Model:
   @printTime
   def evaluation_model(self, model):
     from sklearn.model_selection import learning_curve
-    train_size, train_score, test_score = learning_curve(model, self.X, self.y, cv=3, train_sizes=np.linspace(0.1, 1.0, 5), scoring="neg_mean_squared_error")
+
+    train_size, train_score, test_score = learning_curve(model, self.X, self.y, cv=5, train_sizes=np.linspace(0.1, 1.0, 5))
 
     train_scores_mean = np.mean(train_score, axis=1)
     train_scores_std = np.std(train_score, axis=1)
@@ -104,6 +113,7 @@ class Model:
                         color="r")
     plt.fill_between(train_size, test_scores_mean - test_scores_std,
                         test_scores_mean + test_scores_std, alpha=0.1, color="g")
+
     plt.plot(train_size, train_scores_mean, 'o--', color="r",
                 label="Training score")
     plt.plot(train_size, test_scores_mean, 'o-', color="g",
