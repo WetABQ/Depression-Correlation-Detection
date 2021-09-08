@@ -9,3 +9,4 @@ videodata
 __pycache__
 plaidml-venv
 weibodata
+*.csv
