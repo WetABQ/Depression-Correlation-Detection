@@ -23,7 +23,8 @@ from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 
 from sklearn.pipeline import Pipeline
-from sklearn.utils.extmath import density
+from sklearn.utils import class_weight
+from sklearn.utils.extmath import density, weighted_mode
 
 from sklearn import metrics
 
@@ -53,13 +54,13 @@ class Model:
 
   @printTime
   def train_logistic(self, train=False) -> LogisticRegression:
-    logreg = LogisticRegression()
+    logreg = LogisticRegression(class_weight="balanced")
     if train: self.train_model(logreg)
     return logreg
 
   @printTime
   def train_svm(self, train=False) -> SVC:
-    svm = SVC()
+    svm = SVC(class_weight="balanced")
     if train: self.train_model(svm)
     return svm
 
@@ -75,13 +76,13 @@ class Model:
   
   @printTime
   def train_decision_tree(self, train=False) -> DecisionTreeClassifier:
-    dtc = DecisionTreeClassifier()
+    dtc = DecisionTreeClassifier(class_weight="balanced")
     if train: self.train_model(dtc)
     return dtc
 
   @printTime
   def train_random_forest(self, train=False) -> RandomForestClassifier:
-    rfc = RandomForestClassifier()
+    rfc = RandomForestClassifier(class_weight="balanced")
     if train: self.train_model(rfc)
     return rfc
 
