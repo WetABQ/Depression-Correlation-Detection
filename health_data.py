@@ -20,8 +20,8 @@ class DepressionHealthData:
   def __play_healthdata(self):
     print("Read Health Data")
     #qu = reduce(lambda left, right: pd.merge(left, right, how='inner', on=['SEQN']), health_datas.values()) # Merge All
-    self.df = self.raw_health_data["qu"]
-    #self.df = self.raw_health_data["qu"].merge(self.raw_health_data["de"], how='inner', on=['SEQN']).merge(self.raw_health_data["me"], how='inner', on=['SEQN']) # Only Merge Questionnaire and Demographics
+    # self.df = self.raw_health_data["qu"]
+    self.df = self.raw_health_data["qu"].merge(self.raw_health_data["de"], how='left', on=['SEQN']).merge(self.raw_health_data["me"], how='left', on=['SEQN']) # Only Merge Questionnaire and Demographics
     print(self.df.head())
     print("Merged Data")
 
@@ -35,11 +35,11 @@ class DepressionHealthData:
     print("Evaluated Depression Status, inserted SUM column")
 
   @printTime
-  def get_depression_status(self, classify = False, depression_level = 8) -> Series:
-    dpq = self.df.loc[:,['SEQN','DPQ010',	'DPQ020',	'DPQ030',	'DPQ040',	'DPQ050',	'DPQ060',	'DPQ070',	'DPQ080',	'DPQ090']].copy()
+  def get_depression_status(self, classify = False, depression_level = 5) -> Series:
+    dpq = self.df.loc[:,['SEQN','DPQ010',	'DPQ020',	'DPQ030',	'DPQ040',	'DPQ050',	'DPQ060',	'DPQ070',	'DPQ080',	'DPQ090', "DPQ100"]].copy()
     dpq = dpq.dropna(thresh = 9) # drop when > 9 NaN
-    a = dpq.loc[:, ['DPQ010', 'DPQ020',	'DPQ030',	'DPQ040',	'DPQ050',	'DPQ060',	'DPQ070',	'DPQ080',	'DPQ090']]
-    a[a > 3] = 0 # 将大于 3 的DPQ值转为 0
+    a = dpq.loc[:, ['DPQ010', 'DPQ020',	'DPQ030',	'DPQ040',	'DPQ050',	'DPQ060',	'DPQ070',	'DPQ080',	'DPQ090', "DPQ100"]]
+    #a[a > 3] = 0 # 将大于 3 的DPQ值转为 0
     sum = a.sum(axis = 1)
     if classify:
       sum[sum <= depression_level] = 0
